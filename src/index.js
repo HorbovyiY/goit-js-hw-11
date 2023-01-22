@@ -1,4 +1,4 @@
-// import axios from 'axios'; delete
+import axios from 'axios'; 
 import Notiflix from 'notiflix';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
@@ -20,9 +20,9 @@ gallery.addEventListener('click', onContainerClick);
 
 async function loadMore(){
     const query = await queryToServer(input.value);
-    createMarkup(query.hits);
+    createMarkup(query.data.hits);
             
-        if (query.totalHits<per_page*(page-1)) {
+        if (query.data.totalHits<per_page*(page-1)) {
             btnLoadMore.classList.add('is-hidden');
             Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
         }
@@ -39,15 +39,16 @@ async function loadMore(){
 
 async function queryToServer(query) {
     try {
-        const response = await fetch(
+        const response = await axios.get(
             `${BASE_URL}/?key=${KEY}&q=${query}&${BASE_QUERY}&per_page=${per_page}&page=${page}`
         );
-        if (!response.ok) {
-            throw new Error(response.statusText)
-        }
-        const data = await response.json();
+        // if (!response.ok) {
+        //     throw new Error(response.statusText)
+        // }
+        console.log(response);
+        // const data = await response.json();
         page += 1;
-        return data;
+        return response;
     } catch (err) { 
         console.log('err');
     }
@@ -59,18 +60,17 @@ async function onSubmit(e) {
     page = 1;
     gallery.innerHTML = '';
     const query = await queryToServer(input.value);
-        if (query.totalHits == 0) { 
+        if (query.data.totalHits == 0) { 
         Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
         return;
     }
-    console.log(query.totalHits);
-    createMarkup(query.hits);
-    if (query.totalHits <= per_page) { 
+    createMarkup(query.data.hits);
+    if (query.data.totalHits <= per_page) { 
         Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
         return;
     }
     btnLoadMore.classList.remove('is-hidden');
-    Notiflix.Notify.info(`Hooray! We found ${query.totalHits} images.`);
+    Notiflix.Notify.info(`Hooray! We found ${query.data.totalHits} images.`);
 }
 
 async function createMarkup(arr) {
