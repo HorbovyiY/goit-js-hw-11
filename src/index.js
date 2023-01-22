@@ -63,14 +63,17 @@ async function onSubmit(e) {
         Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
         return;
     }
+    console.log(query.totalHits);
     createMarkup(query.hits);
+    if (query.totalHits <= per_page) { 
+        Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
+        return;
+    }
     btnLoadMore.classList.remove('is-hidden');
     Notiflix.Notify.info(`Hooray! We found ${query.totalHits} images.`);
 }
 
 async function createMarkup(arr) {
-    
-
     const markup = arr.map(({webformatURL, largeImageURL, tags, likes, views, comments, downloads
     } ) => `<a href="${largeImageURL}"><div class="photo-card">
   <img src="${webformatURL}" alt="${tags}" loading="lazy" class="gallery__image"/>
