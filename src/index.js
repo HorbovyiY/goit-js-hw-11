@@ -42,11 +42,9 @@ async function queryToServer(query) {
         const response = await axios.get(
             `${BASE_URL}/?key=${KEY}&q=${query}&${BASE_QUERY}&per_page=${per_page}&page=${page}`
         );
-        // if (!response.ok) {
-        //     throw new Error(response.statusText)
-        // }
-        console.log(response);
-        // const data = await response.json();
+        if (!response.status==200) {
+            throw new Error(response.statusText)
+        }
         page += 1;
         return response;
     } catch (err) { 
